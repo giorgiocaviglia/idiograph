@@ -1,0 +1,87 @@
+body { padding-top: 70px; }
+
+/* Navbar */
+
+.navbar-default {
+  background-color: transparent;
+  border: none;
+}
+
+
+
+svg {
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+/*
+svg:not(.active):not(.ctrl) {
+  cursor: crosshair;
+}
+*/
+
+
+path.link {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1px;
+  stroke-opacity: .1;
+  cursor: default;
+}
+
+svg:not(.active):not(.ctrl) path.link {
+  cursor: pointer;
+}
+
+path.link.selected {
+  stroke-dasharray: 10,2;
+}
+
+path.link.dragline {
+  pointer-events: none;
+}
+
+path.link.hidden {
+  stroke-width: 0;
+}
+
+.node {
+  cursor: pointer;
+}
+
+.node .point{
+  fill: #999;
+  stroke-width: 1.5px;
+  stroke: #fff;
+}
+
+.node:hover .point {
+  stroke: #666;
+}
+
+.node.cluster .point {
+  fill: #f00;
+}
+
+circle.node.selected {
+  fill: #ff0000 !important;
+}
+
+circle.node.reflexive {
+  stroke: #000 !important;
+  stroke-width: 2.5px;
+}
+
+text {
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+
+text.id {
+  text-anchor: middle;
+  font-weight: bold;
+}

@@ -1,0 +1,43 @@
+<div class="row">
+	<div class="col-lg-12">
+		<div class="btn-group" data-toggle="buttons">
+			<label class="btn btn-primary">
+				<input type="radio" name="options" id="option1"> 1
+			</label>
+			<label class="btn btn-primary">
+				<input type="radio" name="options" id="option2"> 2
+			</label>
+			<label class="btn btn-primary">
+				<input type="radio" name="options" id="option3"> 3
+			</label>
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+
+	<div class="col-lg-2">
+		<label class="checkbox"> Force layout
+			<input type="checkbox" ng-model="enableLayout"></input>
+		</label>
+
+		<label class="checkbox"> Grouping
+			<input type="checkbox" ng-model="grouping"></input>
+		</label>
+
+		<label class="checkbox"> Show links
+			<input type="checkbox" ng-model="showLinks"></input>
+		</label>
+
+		<button ng-click="running=!running">Stop</button>
+
+	</div>
+	
+	<div class="col-lg-10">
+
+		<div graph></div>
+
+	</div>
+
+</div>
