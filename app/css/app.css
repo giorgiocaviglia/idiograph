@@ -7,15 +7,42 @@ body { padding-top: 70px; }
   border: none;
 }
 
+.d3-tip {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+.brush .extent {
+    fill-opacity: .1;
+    stroke: #fff;
+    shape-rendering: crispEdges;
+}
+
 
 
 svg {
+  background-color: #f5f5f5;
   cursor: default;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+}
+
+.overlay {
+  display: none;
+}
+
+.overlay.active {
+  display: initial;
+  cursor: -webkit-grab;
+  cursor:    -moz-grab;
 }
 
 /*
@@ -56,12 +83,17 @@ path.link.hidden {
 .node .point{
   fill: #999;
   stroke-width: 1.5px;
+  stroke: #f5f5f5;
+}
+
+.node.fixed .point{
   stroke: #fff;
 }
 
-.node:hover .point {
+.node.selected .point {
   stroke: #666;
 }
+
 
 .node.cluster .point {
   fill: #f00;
@@ -75,6 +107,11 @@ circle.node.reflexive {
   stroke: #000 !important;
   stroke-width: 2.5px;
 }
+
+.node:hover .point {
+  fill: #000;
+}
+
 
 text {
   font: 12px sans-serif;

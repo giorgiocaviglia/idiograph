@@ -3,9 +3,9 @@
 	d3.graph = function(){
 
 		var width, height,
-				zoom,
+				zoom, zooming, brush, shiftKey,
 				nodes, links,
-				force,
+				force, drag, dragging,
 				voronoi,
 				pack,
 				nodePadding = 30,
@@ -14,9 +14,10 @@
 				linkStrength = 1,
 				line = d3.svg.line().interpolate('bundle'),
 				overlay, link, node, circle,
-				dispatch = d3.dispatch('nodeMousedown'),
-				selectedNode,
+				dispatch = d3.dispatch('selected'),
+				selection,
 				showLinks = false,
+				nodeTip,
 				color;
 
 		function chart(svg){
@@ -62,15 +63,60 @@
 
 			  zoom = zoom || d3.behavior.zoom().on("zoom", redraw);
 
+			  d3.select("body")
+			    .attr("tabindex", 1)
+			    .on("keydown.brush", keyflip)
+			    .on("keyup.brush", keyflip)
+			    .each(function() { this.focus(); })
+
 			  // init svg elements
 			  svg.attr("width", width)
-			  	.attr("height", height).call(zoom);
-				
-				overlay = overlay || svg.append("rect")
-					.attr("class","overlay")
-					.attr("width", width)
-					.attr("height", height)
-					.attr("fill","none");
+			  	.attr("height", height)
+			  	.call(zoom)
+
+			  zooming = svg.on("mousedown.zoom");
+
+			  svg
+			  	//.on("keydown.brush", keyflip)
+    			.on("mouseup.selection", selected)
+    			.on("dblclick.zoom", null)
+			  	.on("mousedown.zoom", null)
+			    .on("touchstart.zoom", null)
+			    .on("touchmove.zoom", null)
+			    .on("touchend.zoom", null);
+
+
+			  /*$(document).keydown(function(e) {
+				    if(e.keyCode == 32) {
+				        keydown();
+				    }
+				});*/
+
+				d3.select(window)
+			  	.on("keydown.pan", keydown)
+			  	.on("keyup.pan", keyup)
+
+			  brush = brush || svg.append("g")
+		      .datum(function() { return { selected: false, previouslySelected: false }; })
+		      .attr("class", "brush")
+		      .call(d3.svg.brush()
+		        .x(d3.scale.identity().domain([0, width]))
+		        .y(d3.scale.identity().domain([0, height]))
+		        .on("brushstart", function(d) {
+		          node.each(function(d) { d.previouslySelected = shiftKey && d.selected; });
+		        })
+		        .on("brush", function() {
+		          var extent = d3.event.target.extent();
+		          node.classed("selected", function(d) {
+		            return d.selected = d.previouslySelected ^
+		                (extent[0][0] <= (d.x * zoom.scale() + zoom.translate()[0]) && (d.x * zoom.scale() + zoom.translate()[0]) < extent[1][0]
+		                && extent[0][1] <= (d.y * zoom.scale() + zoom.translate()[1]) && (d.y * zoom.scale() + zoom.translate()[1]) < extent[1][1]);
+		          });
+		        })
+		        .on("brushend", function() {
+		          d3.event.target.clear();
+		          d3.select(this).call(d3.event.target);
+		        }));
 			 	
 			 	link = link || svg.append("g")
 			 		.attr("class","links")
@@ -80,6 +126,39 @@
 			 		.attr("class","nodes")
 			 		.selectAll(".node");
 
+			 	overlay = overlay || svg.append("rect")
+					.attr("class","overlay")
+					.classed("active", false)
+					.attr("width", width)
+					.attr("height", height)
+					.attr("fill-opacity", 0);
+
+				drag = drag || force.drag()
+					.on("dragstart", function (d) {
+						
+					})
+					.on("drag.force", function (a) {
+
+						 node
+							.filter(function(d){ return d.selected; })
+							.each(function(d){
+								d.fixed = true;
+								d.px = d.x + d3.event.dx / zoom.scale();
+								d.py = d.y + d3.event.dy / zoom.scale();
+							})
+
+						force.resume();
+					})
+
+			 	// brush
+
+			 	nodeTip = d3.tip().attr("class","d3-tip").html(function(d) { return d.data.name; });
+
+				svg.call(nodeTip)
+
+				function selected(){
+					dispatch.selected(node.filter(function(d){ return d.selected; }))
+				}
 
 			 	function update() {
 
@@ -97,7 +176,8 @@
 
 				 	node = node.data(nodes.filter(function(d){ return d.type=="node"; }), function(d){ return d.id; });
 
-				 	node.selectAll(".point")
+				 	node
+						.selectAll(".point")
 				 		.style("fill", function(d){ return color(d.cluster); })
 
 				 	var g = node.enter()
@@ -105,22 +185,34 @@
 				 		.attr("class","node")
 				 		.classed("cluster", function(d){ return d.type == "cluster";})
 				 		.call(drag)
-				 		.on("mousedown", nodeMousedown)
+				 		.on("mouseover", function(){
+			        //this.parentNode.appendChild(this);
+			      })
+				 		.on("mousedown", function(d) {
+			        if (shiftKey) d3.select(this).classed("selected", d.selected = !d.selected);
+			        else if (!d.selected) {
+			        	node.classed("selected", function(p) { return p.selected = d === p; });
+			        }
+			      })
+
+				 	//	.on("mouseover", nodeTip.show)
+				 	//	.on("mouseout", nodeTip.hide)
 
 				 	// Voronoi circles for better selection
 				 	g.append('circle')
+				 		.attr("class", "voronoi")
         		.attr('r', 30)
         		.attr('fill-opacity', 0);
 
 				 	g.append("circle")
 				 		.attr("class","point")
 				 		.style("fill", function(d){ return color(d.cluster); })
-				 		.attr("r", 4)
+				 		.attr("r", 5)
 				 		.transition()
 		    	  .duration(500)
 		    	  //.delay(function(d, i) { return i * 5; })
             .attrTween("r", function(d) {
-		            var i = d3.interpolate(0, 4);
+		            var i = d3.interpolate(0, 5);
 		            return function(t) { return d.radius = i(t)  };
 		        });
 
@@ -130,6 +222,57 @@
 
 			 	}
 
+			function updateBrush() {
+			    var extent = d3.event.target.extent();
+
+			    d3.selectAll(".node").select("circle").classed("selected", function (d) {
+			        if (extent[0][0]  <= d.x && d.x < extent[1][0]  && extent[0][1]  <= d.y && d.y < extent[1][1] ) {
+			            if (d.group == "Domain") {
+			                //                domains += d.name + ",";
+			            }
+			            return true;
+			        }
+			        return false;
+			    });
+			}
+
+			function keyflip() {
+			  shiftKey = d3.event.shiftKey || d3.event.metaKey;
+			}
+
+
+			function keydown(){
+
+				d3.event.preventDefault();
+
+				if (d3.event.keyCode == 32) {
+
+					overlay.classed("active", true);
+
+					svg
+				  	.on("mousedown.zoom", zooming)
+				    .on("touchstart.zoom", zooming)
+				    .on("touchmove.zoom", zooming)
+				    .on("touchend.zoom", zooming);
+				  return false;
+				}
+
+			}
+
+			function keyup(e){
+				
+				if (d3.event.keyCode == 32) {
+
+					overlay.classed("active", false);
+
+					svg
+				  	.on("mousedown.zoom", null)
+				    .on("touchstart.zoom", null)
+				    .on("touchmove.zoom", null)
+				    .on("touchend.zoom", null);
+				}
+
+			}
 
 			function nodeMousedown(d){
 				dispatch.nodeMousedown(d);
@@ -288,11 +431,17 @@
 			  }
 
 			  function redraw(){
+
+			  	// check for SPACEBAR
+			  	//var e = d3.event.sourceEvent
+
 					link.attr("d", curve);
 					node.attr('transform', function(d) {
 						    return 'translate(' + (d.x * zoom.scale() + zoom.translate()[0]) + ',' + (d.y * zoom.scale() + zoom.translate()[1]) + ')';
 						  })
 						  .attr('clip-path', function(d) { return 'url(#clip-'+d.index+')'; });
+
+					node.classed("fixed", function(d){ return d.fixed; })
 
 				  var clip = svg.selectAll('.clip')
 			      .data( recenterVoronoi(node.data()), function(d) { return d.point.index; } );
@@ -307,17 +456,7 @@
 			        .attr('d', function(d) { return 'M'+d.join(',')+'Z'; });
 				}
 
-			  var drag = force.drag()
-					.on("dragstart", function (d) {
-						d3.event.sourceEvent.stopPropagation();
-						d.fixed = true;
-						//d3.select(this).classed("fixed", true).style('stroke', "#222");
-					})
-					.on("drag.force", function (d) {
-						d.px = d.x + d3.event.dx / zoom.scale();
-						d.py = d.y + d3.event.dy / zoom.scale();
-						force.resume();
-					});
+			  
 
 			  update();
 				

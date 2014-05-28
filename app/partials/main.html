@@ -2,10 +2,10 @@
 	<div class="col-lg-12">
 		<div class="btn-group" data-toggle="buttons">
 			<label class="btn btn-primary">
-				<input type="radio" name="options" id="option1"> 1
+				<input type="radio" name="options" id="option1"> Select
 			</label>
 			<label class="btn btn-primary">
-				<input type="radio" name="options" id="option2"> 2
+				<input type="radio" name="options" id="option2"> Move
 			</label>
 			<label class="btn btn-primary">
 				<input type="radio" name="options" id="option3"> 3
@@ -31,6 +31,13 @@
 		</label>
 
 		<button ng-click="running=!running">Stop</button>
+
+		<h5>Selection</h5>
+		<span class="muted" ng-show="!selection.length">No selection</span>
+		<ul class="list-unstyled" ng-show="selection.length">
+			<li ng-repeat="element in selection">{{element.name}}</li>
+		</ul>
+		
 
 	</div>
 	

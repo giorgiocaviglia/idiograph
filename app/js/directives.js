@@ -20,10 +20,15 @@ angular.module('myApp.directives', [])
 
         	graph
         		.width(element.width())
-        		.height(600)
+        		.height(650)
                 .linkStrength(scope.enableLayout ? 1 : 0)
                 .group(scope.grouping ? "group" : null)
                 .showLinks(scope.showLinks)
+                // listeners
+                .on('selected', function(d){
+                    scope.selection = d.data().map(function(n){ return n.data; });
+                    scope.$digest();
+                })
         		
         	svg
         		.datum(scope.data)
