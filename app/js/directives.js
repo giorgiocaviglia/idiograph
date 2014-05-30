@@ -5,9 +5,10 @@
 
 angular.module('myApp.directives', [])
 
-	.directive('graph', function ($rootScope, dataService) {
+	.directive('graph', function () {
     return {
       restrict: 'A',
+
       link: function postLink(scope, element, attrs) {
         
         var graph = d3.graph();
@@ -16,33 +17,49 @@ angular.module('myApp.directives', [])
             .append("svg");
 
         function update(){
-        	if (!scope.data) return;
+        	if (!scope.datas) return;
 
         	graph
         		.width(element.width())
         		.height(650)
-                .linkStrength(scope.enableLayout ? 1 : 0)
-                .group(scope.grouping ? "group" : null)
-                .showLinks(scope.showLinks)
-                // listeners
-                .on('selected', function(d){
-                    scope.selection = d.data().map(function(n){ return n.data; });
-                    scope.$digest();
-                })
-        		
+            .linkStrength(scope.enableLayout ? 1 : 0)
+            .group(scope.grouping ? "newGroup" : null)
+            .showLinks(scope.status.showLinks)
+            // listeners
+            .on('selected', function(d){
+                scope.status.selection = d.data()//.map(function(n){ return n.data; });
+                if(!scope.$$phase) scope.$apply();
+            })
+            .editing(scope.status.editing)
+          
         	svg
-        		.datum(scope.data)
+        		.datum(scope.datas)
         		.call(graph);
         }
-
-        scope.$watch('data', update);
+        
+        scope.$watch('datas', update);
         scope.$watch('enableLayout', update);
         scope.$watch('grouping', update);
-        scope.$watch('showLinks', update);  
+        scope.$watch('status.showLinks', update);
+        scope.$watch('status.editing', function(editing){
+          graph.editing(editing)
+        });
         scope.$watch('running', function(running){
-            if (!running) graph.stop();
-            else graph.start();
-        });        
+            //graph.select(function(d){ return d.data.group == 1; })
+            //if (!running) graph.stop();
+            //else graph.start();
+            if (!scope.datas || !scope.status.selection) return;
+            scope.status.selection.forEach(function(d){ d.data.newGroup=Math.random() })
+            update();
+        });
+
+        scope.$on("update", update);
+        
+        // selections
+        scope.$watch('status.selectFunction', function(selectFunction){
+          if (!selectFunction) return;
+            graph.select(selectFunction);
+        });
 
       }
     };

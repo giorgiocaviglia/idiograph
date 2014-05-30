@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/app.css"/>
 
 </head>
-<body>
+<body ng-controller="appCtrl">
 
   <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -36,7 +36,53 @@
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-6">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
+  
+            <!-- Edit -->
+            <li class="dropdown">
+              <a id="dropEdit" ng-href="!#" role="button" class="dropdown-toggle" data-toggle="dropdown">Edit</a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropEdit">
+                <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="delete()">Delete</a></li>
+                <li role="presentation" class="divider"></li>
+                <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="lock()">Lock</a></li>
+                <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="unlock()">Unlock</a></li>
+              </ul>
+            </li>
+          
+            <!-- Select -->
+            <li class="dropdown">
+              <a id="dropSelect" ng-href="!#" role="button" class="dropdown-toggle" data-toggle="dropdown">Select</a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropSelect">
+                <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="selectAll()">All</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="selectNone()">None</a></li>
+                <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="selectInverse()">Inverse</a></li>
+                <li role="presentation" class="divider"></li>
+                <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="selectConnected()">Expand Selection to Linked</a></li>
+                <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="selectOutConnected()">Expand Selection to Linked out</a></li>
+                <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="selectInConnected()">Expand Selection to Linked in</a></li>
+                <li role="presentation" class="divider"></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="selectLocked()">Locked</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="selectUnlocked()">Unlocked</a></li>
+              </ul>
+            </li>
+
+            <!-- Arrange -->
+            <li class="dropdown">
+              <a id="dropArrange" ng-href="!#" role="button" class="dropdown-toggle" data-toggle="dropdown">Arrange</a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropArrange">
+                <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="selectAll()">By Group</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="selectAll()">By Links</a></li>
+              </ul>
+            </li>
+
+            <!-- View -->
+            <li class="dropdown">
+              <a id="dropView" ng-href="!#" role="button" class="dropdown-toggle" data-toggle="dropdown">View</a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropView">
+                <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="status.showLinks=true" ng-show="!status.showLinks">Show links</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="status.showLinks=false" ng-show="status.showLinks">Hide links</a></li>
+              </ul>
+            </li>
+          
           </ul>
         </div><!-- /.navbar-collapse -->
       </div>

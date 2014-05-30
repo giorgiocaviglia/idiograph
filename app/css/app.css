@@ -76,8 +76,15 @@ path.link.hidden {
   stroke-width: 0;
 }
 
+path.dragline {
+  stroke-opacity: .5;
+  stroke-width: 2px;
+  stroke-dasharray: 5px;
+}
+
 .node {
   cursor: pointer;
+  opacity: .7;
 }
 
 .node .point{
@@ -88,6 +95,11 @@ path.link.hidden {
 
 .node.fixed .point{
   stroke: #fff;
+}
+
+.node:hover,
+.node.selected {
+  opacity: 1;
 }
 
 .node.selected .point {

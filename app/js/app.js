@@ -10,6 +10,6 @@ angular.module('myApp', [
   'myApp.controllers'
 ]).
 config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/', {templateUrl: 'partials/main.html', controller: 'MyCtrl'});
+  $routeProvider.when('/', {templateUrl: 'partials/main.html', controller: 'mainCtrl'});
   $routeProvider.otherwise({redirectTo: '/'});
 }]);
