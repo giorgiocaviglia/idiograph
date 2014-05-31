@@ -18,8 +18,11 @@ angular.module('myApp.controllers', [])
       function(data){
         // let's create proper data objects
         data.nodes = data.nodes.map(function(d){
-          d.newGroup = null;
-          return { data: d };
+          return {
+            groups : {},
+            tags : [],
+            data: d 
+          };
         })
 
         $scope.datas = data;
@@ -78,7 +81,7 @@ angular.module('myApp.controllers', [])
 
     $scope.delete = function(){
       if (!$scope.status.selection.length) return;
-      $scope.status.selection.forEach(function(d){ d.hide = true; })
+      $scope.status.selection.forEach(function(d){ d.hidden = true; })
       $scope.status.selection = [];
       $scope.selectNone();
       $scope.$broadcast("update");
@@ -99,6 +102,19 @@ angular.module('myApp.controllers', [])
       //$scope.selectNone();
       $scope.$broadcast("update");
     }
+
+    $scope.applyNoLayout = function(){
+      $scope.$broadcast("applyNoLayout");
+    }
+
+    $scope.applyForceLayout = function(){
+      $scope.$broadcast("applyForceLayout");
+    }
+
+    $scope.applyGroupLayout = function(){
+      $scope.$broadcast("applyGroupLayout");
+    }
+
 
   }])
 

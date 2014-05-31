@@ -35,6 +35,10 @@ svg {
   user-select: none;
 }
 
+svg.editing {
+  border: 1px dashed #999;
+}
+
 .overlay {
   display: none;
 }
@@ -79,7 +83,8 @@ path.link.hidden {
 path.dragline {
   stroke-opacity: .5;
   stroke-width: 2px;
-  stroke-dasharray: 5px;
+  stroke-dasharray: 1px 5px;
+  stroke-linecap: round;
 }
 
 .node {

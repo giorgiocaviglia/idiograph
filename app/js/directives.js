@@ -22,16 +22,16 @@ angular.module('myApp.directives', [])
         	graph
         		.width(element.width())
         		.height(650)
-            .linkStrength(scope.enableLayout ? 1 : 0)
-            .group(scope.grouping ? "newGroup" : null)
-            .showLinks(scope.status.showLinks)
-            // listeners
-            .on('selected', function(d){
-                scope.status.selection = d.data()//.map(function(n){ return n.data; });
-                if(!scope.$$phase) scope.$apply();
-            })
+                .showLinks(scope.status.showLinks)            
+                // listeners
+                .on('selected', function(d){
+                    scope.status.selection = d.data()//.map(function(n){ return n.data; });
+                    if(!scope.$$phase) scope.$apply();
+                })
+            /*
             .editing(scope.status.editing)
-          
+            .group(scope.grouping ? "newGroup" : null)
+            */
         	svg
         		.datum(scope.datas)
         		.call(graph);
@@ -40,25 +40,38 @@ angular.module('myApp.directives', [])
         scope.$watch('datas', update);
         scope.$watch('enableLayout', update);
         scope.$watch('grouping', update);
-        scope.$watch('status.showLinks', update);
+        scope.$watch('status.showLinks', function(showLinks){
+            graph.showLinks(showLinks);
+        });
         scope.$watch('status.editing', function(editing){
-          graph.editing(editing)
+            graph.editing(editing)
         });
         scope.$watch('running', function(running){
             //graph.select(function(d){ return d.data.group == 1; })
             //if (!running) graph.stop();
             //else graph.start();
-            if (!scope.datas || !scope.status.selection) return;
-            scope.status.selection.forEach(function(d){ d.data.newGroup=Math.random() })
-            update();
+            //if (!scope.datas || !scope.status.selection) return;
+            //scope.status.selection.forEach(function(d){ d.data.newGroup=Math.random() })
+            //update();
+            if(running) return
         });
 
         scope.$on("update", update);
+
+        scope.$on("applyForceLayout", function(){
+            graph.applyForceLayout();            
+        });
+        scope.$on("applyGroupLayout", function(){
+            graph.applyGroupLayout();            
+        });
+        scope.$on("applyNoLayout", function(){
+            graph.applyNoLayout();            
+        });
         
         // selections
         scope.$watch('status.selectFunction', function(selectFunction){
-          if (!selectFunction) return;
-            graph.select(selectFunction);
+            if (!selectFunction) return;
+            graph.selectNodes(selectFunction);
         });
 
       }
