@@ -14,16 +14,22 @@
 				pack, force,
 				// Zoom, Drag & Brush
 				zoom, drag, brush,
-				zoomingFunction, shiftKey,
+				zoomingFunction, shiftKey, panning,
 				// Main elements
 				node, link,
 				// Other elements
 				overlay, dragLine,
 				// Event dispatcher
-				dispatch = d3.dispatch('selected'),
+				dispatch = d3.dispatch(
+					'selected',
+					'forceStart',
+					'forceEnd',
+					'zoomEnd'
+					),
 
 				// options,
 				showLinks = true,
+				showLabels = true,
 				editing = false,
 
 				//mouse vars
@@ -36,8 +42,9 @@
 				// Graphics
 				width, height,
 				color,
+				nodeTip,
 				line = d3.svg.line().interpolate('bundle'),
-				nodePadding = 30,
+				nodePadding = 20,
 				clusterPadding = nodePadding * 2.5; // magic
 
 		function chart(selection){
@@ -59,17 +66,21 @@
         // force directed graph
 				force = force || d3.layout.force()
 				  .charge(-120)
-				  .linkDistance(30)
+				  .linkDistance(50)
 				  .linkStrength(0)//linkStrength)
 			    .on("tick", redraw)
+			    .on("end", lockNodes)
+			    .on("start.force", forceStart)
+			    .on("end.force", forceEnd)
 
 				// Updates nodes and links
 				// from this moment on use only nodes and links
-				updateNodesLinks(_data);					
+				updateNodesLinks(_data);
 
 			  // drag function
 			  drag = drag || force.drag()
 					.on("drag.force", function (a) {
+						if (editing) return;
 						 node
 							.filter(function(d){ return d.selected; })
 							.each(function(d){
@@ -81,7 +92,11 @@
 						//force.resume();
 					})
 
-        zoom = zoom || d3.behavior.zoom().on("zoom", redraw);
+        zoom = zoom || d3.behavior.zoom()
+        	.on("zoom", redraw)
+        	.on("zoomend", zoomEnd)
+
+        zoomEnd(zoom);
 
         brush = brush || svg.append("g")
 		      .datum(function() { return { selected: false, previouslySelected: false }; })
@@ -93,6 +108,10 @@
 		          node.each(function(d) { d.previouslySelected = shiftKey && d.selected; });
 		        })
 		        .on("brush", function() {
+		        	if (editing) {
+		        		d3.select(this).select(".extent").remove();
+		        		return;
+		        	}
 		          var extent = d3.event.target.extent();
 		          node.classed("selected", function(d) {
 		            return d.selected = d.previouslySelected ^
@@ -126,13 +145,20 @@
 			  svg
     			.on("mouseup.selection", selected)
     			.on("mousemove", function(){ if (editing) mouseMoveEditing(this); })
-    		//	.on("mouseup", function(){ if (editing) mouseUp(); })
+    			.on("mouseup", function(){ if (editing) mouseUp(); })
     			.on("mousedown", function(){ if (editing) mouseDown(this); })
     			.on("dblclick.zoom", null)
 			  	.on("mousedown.zoom", null)
 			    .on("touchstart.zoom", null)
 			    .on("touchmove.zoom", null)
 			    .on("touchend.zoom", null);
+
+			  nodeTip = d3.tip()
+			  	.offset([-10, 0])
+			  	.attr("class","d3-tip")
+			  	.html(label);
+
+				svg.call(nodeTip)
 
 				// Main links container
 				link = link || svg.append("g")
@@ -170,13 +196,13 @@
 			
 			// Nodes clustering (for groupings)
 			var clusters = d3.nest()
-	        .key(function (d) { return group(d.data) ? group(d.data) : null; })
+	        .key(function (d) { return group(d) ? group(d) : null; })
 	        .rollup(function (d){
 	            return { 
 	            	// distinguish b/w nodes and clusters
 	              isNode : false,
 	              // if not grouping let's create a generic null cluster
-	              cluster : group(d[0].data) ? group(d[0].data) : null,
+	              cluster : group(d[0]) ? group(d[0]) : null,
 	              size: 0
 	            } 
 	        })
@@ -195,8 +221,8 @@
 	      .map(function (d,i) {
 	      	d.label = label(d.data);
 	      	d.isNode = true;
-	      	d.cluster = group(d.data) ? group(d.data) : null;
-	      	d.clusterObject = group(d.data) ? clusters[group(d.data)] : clusters[null];
+	      	d.cluster = group(d) ? group(d) : null;
+	      	d.clusterObject = group(d) ? clusters[group(d)] : clusters[null];
 	      	d.size = 1;
 	      	// Links
 	      	d.inLinks = [];
@@ -263,7 +289,8 @@
 			// Update
 			link = link.data(showLinks ? links : []);
 			// Add new
-		 	link.enter().append('svg:path')
+		 	link.enter()
+		 		.append('svg:path')
 		    .attr('class', 'link')
 		  // Remove old
 			link.exit().remove();
@@ -274,14 +301,19 @@
 			node = node.data(nodes.filter(function(d){ return d.isNode; }), function(d){ return d.id; });
 
 		 	node
+		 		.classed("selected", function(d){ return d.selected; })
 				.selectAll(".point")
-		 	//	.style("fill", function(d){ return color(d.cluster); })
+		 		.style("fill", function(d){ return color(d.cluster); })
+
+		 	node.selectAll("text")
+		 		.text(showLabels ? label : null);
 
 		 	// Add new
 		 	var g = node.enter()
 		 		.append('g')
 		 		.attr("class","node")
-		 		.classed("cluster", function(d){ return !d.isNode;})
+		 		.classed("cluster", function(d){ return !d.isNode; })
+		 		.classed("selected", function(d){ return d.selected; })
 		 		.call(drag)
 		 		.on("mousedown", function (d) {
 	        if (editing) mouseDownEditing(d);
@@ -290,6 +322,12 @@
 	      .on("mouseup", function (d) {
 	        if (editing) mouseUpEditing(d);
 	      })
+	      .on("mouseover", nodeTip.show)
+				.on("mouseout", nodeTip.hide)
+
+				//.on("mouseover.highlight", highlightLinked)
+				//.on("mouseout.highlight", unhighlightLinked)
+
 /*	      .on('mouseover', function(d) {
 		      if(!mousedownNode || d === mousedownNode) return;
 		    })
@@ -309,23 +347,34 @@
 		 		.style("fill", function(d){ return color(d.cluster); })
     //		.on("mouseover", nodeTip.show)
 		// 		.on("mouseout", nodeTip.hide)
+				//.attr("r",5)
 		 		.transition()
     	  .duration(500)
         .attrTween("r", function(d) {
             var i = d3.interpolate(0, 5);
             return function(t) { return d.radius = i(t)  };
         });
-        // Remove old
-			 	node.exit().remove();
 
-			 	redraw();
+      g.append("text")
+      	.attr("dx", 12)
+      	.attr("dy", ".35em")
+      	.text(showLabels ? label : null);
+
+      // Remove old
+		 	node.exit().remove();
+
+		 	nodeTip.hide();
+
+		 	redraw();
 
 		}
 
 		// Force tick
 		function tick(e){
+			console.log(e.alpha)
+			if (e.alpha <= 0.01) return;
 	  	node.each(cluster(10 * e.alpha * e.alpha))
-        .each(collide(.5))
+          .each(collide(.5))
 	    redraw();
 	  }
 
@@ -334,7 +383,9 @@
 			
 			link.attr("d", curve);
 			
-			node.attr('transform', function(d) {
+			node
+				.classed("selected", function(d){ return d.selected; })
+				.attr('transform', function(d) {
 		    return 'translate(' + (d.x * zoom.scale() + zoom.translate()[0]) + ',' + (d.y * zoom.scale() + zoom.translate()[1]) + ')';
 		  })
 		  //.attr('clip-path', function(d) { return 'url(#clip-'+d.index+')'; });
@@ -343,9 +394,24 @@
 
 		}
 
+		function highlightLinked(a) {	
+			node
+				.classed("muted", function(d){ 
+        		return d !== a
+        		&& !d.inLinks.filter(function(b){ return a === b; }).length
+        		&& !d.outLinks.filter(function(b){ return a === b; }).length
+				})
+		}
+
+		function unhighlightLinked(d) {
+			node.classed("muted", false)
+		}
+
 		// Listeners
 
 		// Mouse
+
+		// Mouse Over
 
 		// Mouse Down Dragging mode
 		function mouseDownDragging(d,that){
@@ -410,17 +476,18 @@
 
       if(!newLink) {
         newLink = {source: source.id, target: target.id, value: 1, data : {}};
-        data.links.push(newLink)
-        links = createLinks(data.links);
+        _data.links.push(newLink)
+        updateNodesLinks(_data);
+				updateElements();
       }
 
       // select new link
       selectedLink = newLink;
       selectedNode = null;
-      update();
 		}
 
 		function mouseDown(that) {
+				if (panning) return;
 			  // prevent I-bar on drag
 			  //d3.event.preventDefault();
 			  
@@ -430,9 +497,9 @@
 			  if(mousedownNode || mousedownLink) return;
 
 			  // insert new node at point
-			  var point = d3.mouse(that)
+			  var point = d3.mouse(that);
 
-			  addNode();
+			  addNode(point);
 			}
 
 			function mouseUp() {
@@ -463,6 +530,7 @@
 		function keydown(){
 			switch(d3.event.keyCode) {
 				case 32: // spacebar
+					panning = true;
 					overlay.classed("active", true);
 					// Restoring the original zooming
 					svg
@@ -479,6 +547,7 @@
 		function keyup(e){
 			switch(d3.event.keyCode) {
 				case 32: // spacebar
+					panning = false;
 					overlay.classed("active", false);
 					svg
 				  	.on("mousedown.zoom", null)
@@ -489,16 +558,42 @@
 		  }
 		}
 
+		function forceStart(){
+			dispatch.forceStart();
+		}
+
+		function forceEnd(){
+			dispatch.forceEnd();
+		}
+		
+		function zoomEnd(){
+			dispatch.zoomEnd(zoom);
+		}
+
 
 		// Layouts
 		function unlockNodes(){
-			nodes.forEach(function(d){ d.fixed = false; })
+			nodes.forEach(function(d){ d.fixed = !d.selected; }) //<<<< DA RIVEDERE! interessante // = false })
+		}
+
+		function lockNodes(){
+			nodes.forEach(function(d){ d.fixed = true; })
 		}
 
 		// Data
 
-		function addNode(){
-			_data.nodes.push({ data:{} });
+		function addNode(point){
+			var n = { data:{}, groups:{}, tags : [] };
+			if (point){
+				n.px = n.x = (point[0] - zoom.translate()[0]) / zoom.scale() ;
+				n.py = n.y = (point[1] - zoom.translate()[1]) / zoom.scale() ;
+			}
+
+			n.fixed = true;
+			node.each(function(d){ d.selected = false; })
+			n.selected = true;
+
+			_data.nodes.push(n);
 			updateNodesLinks(_data);
 			updateElements();
 		}
@@ -539,7 +634,11 @@
 
 		// Clusterize
 		function cluster(alpha) {
-      return function(d) {
+			// Provisional to stop the force...
+   		/*if (alpha < .01) return function(d){ 
+   			force.alpha(0);
+   		};*/
+		  return function(d) {
           if (!d.isNode) return;
           var cluster = d.clusterObject;
           var x = d.x - cluster.x,
@@ -588,11 +687,11 @@
 		// Accessor functions
 
 		function group(d){
-			return d.group;//null;
+			return null;
 		}
 
 		function label(d){
-			return null;
+			return d.id;
 		}
 
 		function linkValue(d){
@@ -608,6 +707,8 @@
 				.classed("selected", function(d){ return d.selected = d.preSelected; })
 			dispatch.selected(node.filter(function(d){ return d.selected; }));
 		}
+
+		// TODO: provare a limitare l'unlockNodes solo ai selezionati d.selected
 
 		chart.applyForceLayout = function() {
 			unlockNodes()
@@ -628,7 +729,7 @@
 		chart.applyGroupLayout = function() {
 			unlockNodes()
        force
-       	.linkStrength(1)
+       	.linkStrength(0)
        	.on("tick", tick)
        	.start();
 		};
@@ -657,6 +758,12 @@
 			return chart;
 		};
 
+		chart.label = function(_) {
+			if (!arguments.length) return label;
+			label = _;
+			return chart;
+		};
+
 		chart.linkValue = function(_) {
 			if (!arguments.length) return linkValue;
 			linkValue = _;
@@ -667,6 +774,13 @@
 			if (!arguments.length) return showLinks;
 			showLinks = _;
 			if(link) updateElements();
+			return chart;
+		};
+
+		chart.showLabels = function(_) {
+			if (!arguments.length) return showLabels;
+			showLabels = _;
+			if(node) updateElements();
 			return chart;
 		};
 

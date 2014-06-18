@@ -1,5 +1,10 @@
 body { padding-top: 70px; }
 
+canvas { 
+  position: absolute;
+  background-color: #f5f5f5;
+}
+
 /* Navbar */
 
 .navbar-default {
@@ -7,10 +12,21 @@ body { padding-top: 70px; }
   border: none;
 }
 
+.navbar-default .navbar-brand {
+  font-family: 'Bevan', sans-serif;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: #333;
+}
+
+#main {
+  margin-top: 20px;
+}
+
 .d3-tip {
   font-size: 11px;
   line-height: 1;
-  font-weight: bold;
+  font-weight: 300;
   padding: 12px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
@@ -23,10 +39,20 @@ body { padding-top: 70px; }
     shape-rendering: crispEdges;
 }
 
+label {
+  font-weight: 400;
+  font-size: 12px;
+}
 
+input,
+.btn {
+  border-radius: 2px;
+  margin-bottom: 5px;
+}
 
 svg {
   background-color: #f5f5f5;
+  position: absolute;
   cursor: default;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -89,7 +115,7 @@ path.dragline {
 
 .node {
   cursor: pointer;
-  opacity: .7;
+  opacity: .9;
 }
 
 .node .point{
@@ -109,6 +135,10 @@ path.dragline {
 
 .node.selected .point {
   stroke: #666;
+}
+
+.node.muted {
+  opacity: .1;
 }
 
 
@@ -138,4 +168,49 @@ text {
 text.id {
   text-anchor: middle;
   font-weight: bold;
+}
+
+/*
+canvas { width: 1000px; }*/
+
+/* Codemirror */
+
+.CodeMirror {
+  font-family: Menlo, Monaco, Courier, monospace;
+  font-size: 11px;
+  background-color: #ffffff;
+  line-height: 18px;
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  margin-bottom: 10px;
+  height: 203px;
+  border: 1px solid #ddd;
+  color: #444444;
+}
+
+.Codemirror :after, .Codemirror ::before {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+.CodeMirror-activeline {
+  color: #333;
+}
+
+.CodeMirror-activeline-background {
+  background: rgba(68, 204, 164, 0.18) !important;
+}
+
+pre.CodeMirror-placeholder {
+  color: #aaaaaa;
+}
+
+.CodeMirror.highlight {
+  opacity: .5;
+}
+
+.CodeMirror-gutters {
+  border: none;
 }

@@ -12,6 +12,12 @@
     "angular-mocks": "~1.2.x",
     "bootstrap": "~3.1.1",
     "d3": "~3.4.8",
-    "d3-tip": "~0.6.4"
+    "d3-tip": "~0.6.4",
+    "mousetrap": "~1.4.6",
+    "angular-history": "~0.7.5",
+    "jsondiffpatch": "~0.1.7",
+    "codemirror": "~4.2.0",
+    "angular-ui": "~0.4.0",
+    "fabric": "~1.4.7"
   }
 }
