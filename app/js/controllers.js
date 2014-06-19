@@ -306,11 +306,10 @@ angular.module('myApp.controllers', [])
 
     $scope.grouping = function(){
       if (!$scope.status.selection.length) return;
-      console.log($scope.status.groupValue)
-
       $scope.status.selection.forEach(function(d){
         d.groups[$scope.status.groupName] = $scope.status.groupValue;
       })
+      $scope.status.groupValue = "";
       $scope.$broadcast("update");
     }
 

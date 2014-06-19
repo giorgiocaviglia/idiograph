@@ -23,6 +23,9 @@ angular.module('myApp.directives', [])
         		.width(element.width())
         		.height(650)
                 .showLinks(scope.status.showLinks)            
+                .group(group)
+                .label(label)
+
                 // listeners
                 .on('selected', function(d){
                     scope.status.selection = d.data()//.map(function(n){ return n.data; });
@@ -31,17 +34,9 @@ angular.module('myApp.directives', [])
                 .on('forceStart', forceStart)
                 .on('forceEnd', forceEnd)
                 .on('zoomEnd', zoomEnd)
-                .group(group)
-                .label(label)
-            /*
-            .editing(scope.status.editing)
-            
-            */
         	svg
         		.datum(scope.data)
         		.call(graph);
-
-            //scope.register()//.push(dataService.saveStatus(scope.data,scope.previous))            
 
         }
 
@@ -64,8 +59,6 @@ angular.module('myApp.directives', [])
         function label(d){
             return d.data ? d.data['name'] ? d.data['name'] : 'Untitled' : null;
         }
-
-
         
         scope.$watch('data', update);
         scope.$watch('enableLayout', update);
@@ -79,16 +72,6 @@ angular.module('myApp.directives', [])
         scope.$watch('status.editing', function(editing){
             graph.editing(editing)
         });
-        scope.$watch('running', function(running){
-            //graph.select(function(d){ return d.data.group == 1; })
-            //if (!running) graph.stop();
-            //else graph.start();
-            //if (!scope.datas || !scope.status.selection) return;
-            //scope.status.selection.forEach(function(d){ d.data.newGroup=Math.random() })
-            //update();
-            if(running) return
-        });
-
         scope.$on("update", update);
 
         scope.$on("applyForceLayout", function(){

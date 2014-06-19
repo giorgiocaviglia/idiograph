@@ -125,7 +125,7 @@ path.dragline {
 }
 
 .node.fixed .point{
-  stroke: #fff;
+  /*stroke: #f5f5f5;*/
 }
 
 .node:hover,

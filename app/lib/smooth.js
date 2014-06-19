@@ -44,6 +44,7 @@
 				// save data globally
 				data = graph;
 
+				console.log(data)
 				// creating canvas using foreignobject <- magic
  				canvas = canvas || selection.append("canvas")
 					.attr("width", width)

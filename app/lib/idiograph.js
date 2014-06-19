@@ -371,9 +371,8 @@
 
 		// Force tick
 		function tick(e){
-			console.log(e.alpha)
-			if (e.alpha <= 0.01) return;
-	  	node.each(cluster(10 * e.alpha * e.alpha))
+			//if (e.alpha <= 0.01) return;
+	  	node.each(cluster(e.alpha))
           .each(collide(.5))
 	    redraw();
 	  }

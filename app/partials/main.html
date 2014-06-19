@@ -37,15 +37,6 @@
 
 	<div class="col-lg-3">
 
-		
-
-		<!--<h5>Selection ({{status.selection.length || 0}})</h5>-->
-		<!--<span class="muted" ng-show="!status.selection.length">No selection</span>
-		<ul class="list-unstyled" ng-show="status.selection.length">
-			<li ng-repeat="element in status.selection">{{element.data.name}}</li>
-		</ul>-->
-			{{history.length}}
-
 		<ul class="list-unstyled" ng-show="status.selection.length==1">
 			<h5>Properties</h5>
 			<li ng-repeat="(key, value) in status.selection[0].data">
@@ -54,8 +45,8 @@
 			</li>
 			<div>
 				<label class="control-label">Add value</label>
-				<input class="form-control input-sm" type="text" ng-model="status.newKey" placeholder="value"></input>
-				<input class="form-control input-sm" type="text" ng-model="status.newValue" placeholder="key"></input>
+				<input class="form-control input-sm" type="text" ng-model="status.newKey" placeholder="key"></input>
+				<input class="form-control input-sm" type="text" ng-model="status.newValue" placeholder="value"></input>
 				<button class="btn btn-primary btn-sm" ng-click="addValue(status.newKey,status.newValue,status.selection[0].data)">Add</button>
 			</div>
 		</ul>
