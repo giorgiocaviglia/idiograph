@@ -4,7 +4,7 @@
 
 angular.module('myApp.controllers', [])
   .controller('appCtrl', ['$scope', 'dataService', 'History', function($scope, dataService, History) {
-    
+
     $scope.status = {
       showLinks : true,
       showLabels : false,
@@ -40,7 +40,7 @@ angular.module('myApp.controllers', [])
           return {
             groups : {},
             tags : [],
-            data: d 
+            data: d
           };
         })
 
@@ -56,7 +56,7 @@ angular.module('myApp.controllers', [])
 
     }
 
-
+  /*
 
     // loading letters
     dataService.loadData('data/graph.json').then(
@@ -68,21 +68,22 @@ angular.module('myApp.controllers', [])
           return {
             groups : {},
             tags : [],
-            data: d 
+            data: d
           };
         })
         console.log(data.links)
         $scope.$broadcast("update");
 
-        }, 
-      
+        },
+
       function(error){
         $scope.error = error;
       }
 
     );
+    */
 
-    /*
+
 
     // loading people
     dataService.loadData('data/people.tsv').then(
@@ -96,7 +97,7 @@ angular.module('myApp.controllers', [])
           return {
             groups : {},
             tags : [],
-            data: d 
+            data: d
           };
         })
 
@@ -113,7 +114,7 @@ angular.module('myApp.controllers', [])
               nodes[d.data.id] = i;
             })
 
-            
+
             links.forEach(function(d){
               d.source = nodes[d.author];
               d.target = nodes[d.recipient];
@@ -137,8 +138,8 @@ angular.module('myApp.controllers', [])
             if(!$scope.$$phase) $scope.$apply();
             $scope.$broadcast("update");
 
-            }, 
-          
+            },
+
           function(error){
             $scope.error = error;
           }
@@ -147,15 +148,15 @@ angular.module('myApp.controllers', [])
 
 
 
-        }, 
-      
+        },
+
       function(error){
         $scope.error = error;
       }
 
     );
 
-    */
+    
 
     /* Import */
 
@@ -189,7 +190,7 @@ angular.module('myApp.controllers', [])
         delete d.outLinks;
       })
 
-      
+
       var delta = $scope.diffpatcher.diff($scope.data, $scope.previous);
       //$scope.diffpatcher.patch($scope.data, delta)
       $scope.history.push(delta);
@@ -213,7 +214,7 @@ angular.module('myApp.controllers', [])
     }
 
     $scope.redo = function(){
-      
+
     }
 
     // Operations on data
@@ -232,12 +233,12 @@ angular.module('myApp.controllers', [])
         points.push([d.x,d.y])
         return d.id;
       })
-      // only 'external' in links 
+      // only 'external' in links
       inLinks = $scope.data.links.filter(function(link){
         return ids.indexOf(link.source) != -1 && ids.indexOf(link.target) == -1;
       })
 
-      // only 'external' out links 
+      // only 'external' out links
       outLinks = $scope.data.links.filter(function(link){
         return ids.indexOf(link.target) != -1 && ids.indexOf(link.source) == -1;
       })
@@ -260,7 +261,7 @@ angular.module('myApp.controllers', [])
 
       var _inLinks = [],
           _outLinks = [];
-      
+
       inLinks.forEach(function(d){
         if (_inLinks.filter(function(l){ return l.source == d.source && l.target == d.target; }).length == 0) _inLinks.push(d);
       })

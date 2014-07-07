@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-lg-12">
-		
+
 		<div class="btn-group">
 		  <button type="button" class="btn btn-default" ng-click="status.editing=false"><i class="fa fa-arrows"></i></button>
 		  <button type="button" class="btn btn-default" ng-click="status.editing=true"><i class="fa fa-pencil"></i></button>
@@ -37,14 +37,13 @@
 
 	<div class="col-lg-3">
 
-		
+
 
 		<!--<h5>Selection ({{status.selection.length || 0}})</h5>-->
 		<!--<span class="muted" ng-show="!status.selection.length">No selection</span>
 		<ul class="list-unstyled" ng-show="status.selection.length">
 			<li ng-repeat="element in status.selection">{{element.data.name}}</li>
 		</ul>-->
-			{{history.length}}
 
 		<ul class="list-unstyled" ng-show="status.selection.length==1">
 			<h5>Properties</h5>
@@ -59,8 +58,8 @@
 				<button class="btn btn-primary btn-sm" ng-click="addValue(status.newKey,status.newValue,status.selection[0].data)">Add</button>
 			</div>
 		</ul>
-			
-			
+
+
 		<form class="form-inline" role="form" ng-show="status.selection.length">
 		  <div class="form-group">
 		  	<label class="control-label" for="group-value">Group ({{status.groupName}})</label>
@@ -70,17 +69,17 @@
 		</form>
 
 		<div ng-show="status.selection.length">
-			
+
 		</div>
 
-		
+
 
 	</div>
-	
+
 	<div class="col-lg-9">
 
-		<div graph></div>
-		<!--<div smooth style="position:relative"></div>-->
+		<!--<div graph></div>-->
+		<div smooth style="position:relative"></div>
 
 	</div>
 
@@ -96,7 +95,7 @@
 	        <button type="button" class="btn btn-primary" ng-click="parse()" data-dismiss="modal">Save changes</button>
 	      	<div>
 		        <textarea ng-model="status.text"
-					ui-codemirror="{ 
+					ui-codemirror="{
 						lineNumbers : true,
 						lineWrapping : true,
 						placeholder : 'Paste your text or drop a file here. No data on hand? Try one of our sample datasets!'
@@ -110,4 +109,3 @@
 	</div>
 
 </div>
-
