@@ -3,7 +3,7 @@
 	d3.smooth = function(){
 
 		var data,
-				nodes, links, groupLinks,
+				nodes, links,
 				canvas, svg,
 				node, link,
 				quality = 1,
@@ -11,7 +11,7 @@
 				width, height,
 				context,
 				nodes,
-				force, pack, groupForce,
+				force, pack,
 				zoom, x, y, overlay, drag, shiftKey, brush, panning, zoomingFunction,
 				dispatch = d3.dispatch(
 					'selected',
@@ -38,7 +38,7 @@
 				clusterPadding = nodePadding * 2.5; // magic
 
 		function chart(selection){
-
+	
 			selection.each(function(graph){
 
 				// save data globally
@@ -48,7 +48,7 @@
  				canvas = canvas || selection.append("canvas")
 					.attr("width", width)
 					.attr("height", height)
-
+				
 				// crating svg
 				svg = svg || selection.append("svg");
 
@@ -58,7 +58,7 @@
           .padding(nodePadding)
           .children(function (d) { return d.values; })
           .value(function (d) { return d.size; })
-
+				
 				// main force
 				force = force || d3.layout.force()
 					.charge(-120)
@@ -68,14 +68,6 @@
 		      .on("tick", tick)
 		      .on("start", forceStart)
 		      .on("end", forceEnd)
-
-				// group force
-				groupForce = groupForce || d3.layout.force()
-					.charge(-120)
-					.linkDistance(50)
-					.linkStrength(0)//linkStrength)
-					.size([width, height])
-					.on("tick", groupTick)
 
 		    // Let's create nodes and links
 		    updateNodesLinks();
@@ -176,16 +168,16 @@
 
 				// Main links container
 				link = link || svg.append("g")
-					.attr("class","links")
-					.selectAll(".link");
+			 		.attr("class","links")
+			 		.selectAll(".link");
 
 				// Main nodes container
-				node = node || svg.append("g")
-					.attr("class","nodes")
-					.selectAll(".node");
+			 	node = node || svg.append("g")
+			 		.attr("class","nodes")
+			 		.selectAll(".node");
 
-				// For zoom
-				overlay = overlay || svg.append("rect")
+			 	// For zoom
+			 	overlay = overlay || svg.append("rect")
 					.attr("class","overlay")
 					.classed("active", false)
 					.attr("width", width)
@@ -193,24 +185,24 @@
 					.attr("fill-opacity", 0);
 
 				updateElements();
-
+			
 			})
 		}
 
 		// Updating the data
 		function updateNodesLinks(){
-
+			
 			// Nodes clustering (for groupings)
 			var clusters = d3.nest()
         .key(function (d) { return group(d) ? group(d) : null; })
         .rollup(function (d){
-            return {
+            return { 
             	// distinguish b/w nodes and clusters
               isNode : false,
               // if not grouping let's create a generic null cluster
               cluster : group(d[0]) ? group(d[0]) : null,
               size: d.length
-            }
+            } 
         })
         .map(data.nodes);
 
@@ -219,7 +211,7 @@
 	    data.nodes.forEach(function(d,i){
     		d.id = d.hasOwnProperty("id") ? d.id : i;
     	})
-
+      
       // Filtering out invisible (removed) nodes
       var elements = data.nodes.filter(function(d){
 	    		return !d.hidden;
@@ -245,13 +237,13 @@
       var elementsMap = d3.map();
 
 			elements.forEach(function(d){ elementsMap[d.id] = d; })
-
+			
 			// Filtering out links from/to invisible (removed) nodes
 			links = data.links.filter(function(d){
 				return elementsMap[d.source] && elementsMap[d.target];
 			})
 			.map(function(d){
-
+				
 				// Updating links references into nodes
 				elementsMap[d.source].outLinks.push(elementsMap[d.target])
 				elementsMap[d.target].inLinks.push(elementsMap[d.source])
@@ -263,18 +255,7 @@
 					value : linkValue(d),
 					data : {}
 				}
-
-			})
-
-			// groupLinks
-
-			groupLinks = elements.map(function(d){
-				return {
-					source : d,
-					target : d.clusterObject,
-					value : 1,
-					data : {}
-				}
+				
 			})
 
 			// Update color scale
@@ -296,17 +277,11 @@
 	      .nodes(nodes)
 	      .links(links)
 	      .start();
-
-			groupForce
-				.size([width, height])
-				.nodes(nodes)
-				.links(groupLinks)
-
 		}
 
 		// Redraw SVG Links
 		function redrawLinks() {
-			context.strokeStyle = "rgba(200,200,200,.7)";
+			context.strokeStyle = "rgba(200,200,200,.9)";
 	    context.beginPath();
 	    links
 	    	.forEach(function(d,i) {
@@ -333,15 +308,14 @@
  		  	  context.stroke();
 		      context.fill();
 	    });
-
-
+      
+	    
 		}
 
 		function groupTick(e){
 			//if (e.alpha <= 0.01) return;
-	  	node.each(cluster(e.alpha))
+	  	node.each(cluster(10 * e.alpha * e.alpha))
      //     .each(collide(.5))
-
 	    redraw();
 	  }
 
@@ -351,7 +325,7 @@
 			context.clearRect(0, 0, width, height);
 			redrawLinks();
 			//redrawNodes();
-	  	redraw();
+	  	redraw();	   
 		}
 
 		// Redraw SVG nodes + Canvas links
@@ -431,7 +405,7 @@
 					rad = Math.sqrt( Math.pow(targetX-sourceX,2) + Math.pow(targetY-sourceY, 2) )/4,
 					sourceP = Math.atan2((targetY-sourceY),(targetX-sourceX)) - Math.PI/8,
 					targetP = Math.atan2((sourceY-targetY),(sourceX-targetX)) + Math.PI/8;
-
+				
 			return [
 				sourceX, sourceY,
 				sourceX+rad*Math.cos(sourceP), sourceY+rad*Math.sin(sourceP),
@@ -439,7 +413,7 @@
 				targetX,targetY
 				]
 		}
-
+		
 		function curve(d) {
 			var source = d.source,
 				target = d.target,
@@ -450,7 +424,7 @@
 				rad = Math.sqrt( Math.pow(targetX-sourceX,2) + Math.pow(targetY-sourceY, 2) )/4,
 				sourceP = Math.atan2((targetY-sourceY),(targetX-sourceX)) - Math.PI/8,
 				targetP = Math.atan2((sourceY-targetY),(sourceX-targetX)) + Math.PI/8;
-
+			
 			return line([
 				[sourceX, sourceY],
 				[sourceX+rad*Math.cos(sourceP),sourceY+rad*Math.sin(sourceP)],
@@ -466,14 +440,18 @@
 		}
 
 		// Clusterize
-		function _cluster(alpha) {
+		function cluster(alpha) {
+			// Provisional to stop the force...
+   		/*if (alpha < .01) return function(d){ 
+   			force.alpha(0);
+   		};*/
 		  return function(d) {
           if (!d.isNode) return;
           var cluster = d.clusterObject;
           var x = d.x - cluster.x,
               y = d.y - cluster.y,
               l = Math.sqrt(x * x + y * y),
-              r = d.r// + cluster.r;
+              r = d.r + cluster.r;
           if (l != r) {
             l = (l - r) / l * alpha;
             d.x -= x *= l;
@@ -484,25 +462,6 @@
       };
 	  }
 
-		// Clusterize
-		function cluster(alpha) {
-			return function(d) {
-					if (!d.isNode) return;
-					//var cluster = d.clusterObject;
-					var x = d.x - d.cx,
-							y = d.y - d.cy,
-							l = Math.sqrt(x * x + y * y),
-					//		r = d.r + cluster.r;
-					//if (l != r) {
-						l = l / l * alpha;
-						d.x -= x *= l;
-						d.y -= y *= l;
-						//d._x += x;
-						//d._y += y;
-					//}
-			};
-		}
-
 	  // Collision
 		function collide(alpha) {
 	    var quadtree = d3.geom.quadtree(nodes);
@@ -512,7 +471,7 @@
 	            nx2 = d.x + r,
 	            ny1 = d.y - r,
 	            ny2 = d.y + r;
-
+	        
 	        quadtree.visit(function(quad, x1, y1, x2, y2) {
 	            if (quad.point && (quad.point !== d)) {
 	                var x = d.x - quad.point.x,
@@ -587,7 +546,7 @@
       if(mouseupNode === mousedownNode) { resetMouseVars(); return; }
 
       var source, target;
-
+      
       source = mousedownNode;
       target = mouseupNode;
 
@@ -611,7 +570,7 @@
 				if (panning) return;
 			  // prevent I-bar on drag
 			  //d3.event.preventDefault();
-
+			  
 			  // because :active only works in WebKit?
 			  svg.classed('active', true);
 
@@ -795,33 +754,18 @@
        	.on("tick", groupTick)
 				.start();*/
 
-			force.stop();
-
-			nodes.forEach(function(d){
-				d._x = d.x;
-				d._y = d.y;
-			})
+			force
+				.stop();
 
       pack
 				.size([width, height])
 				.nodes({
 	        values: d3.nest()
 	          .key(function (d) { return d.cluster; })
-	          .entries(nodes)//.filter(function(d){ return d.isNode; }))
+	          .entries(nodes)
 	        }
 		    );
-
-			nodes.forEach(function(d){
-				d.cx = d.x;
-				d.cy = d.y;
-				d.x = d._x;
-				d.y = d._y;
-			})
-
-			groupForce.start();
-
 		  redraw();
-
 		};
 
 		d3.rebind(chart, dispatch, "on");

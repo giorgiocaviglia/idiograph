@@ -48,7 +48,7 @@
 				clusterPadding = nodePadding * 2.5; // magic
 
 		function chart(selection){
-			
+
 			// Make the selection available globally
 			svg = selection;
 

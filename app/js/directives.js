@@ -10,7 +10,7 @@ angular.module('myApp.directives', [])
       restrict: 'A',
 
       link: function postLink(scope, element, attrs) {
-        
+
         var graph = d3.graph();
 
         var svg = d3.select(element[0])
@@ -22,7 +22,7 @@ angular.module('myApp.directives', [])
         	graph
         		.width(element.width())
         		.height(650)
-                .showLinks(scope.status.showLinks)            
+                .showLinks(scope.status.showLinks)
                 // listeners
                 .on('selected', function(d){
                     scope.status.selection = d.data()//.map(function(n){ return n.data; });
@@ -35,13 +35,13 @@ angular.module('myApp.directives', [])
                 .label(label)
             /*
             .editing(scope.status.editing)
-            
+
             */
         	svg
         		.datum(scope.data)
         		.call(graph);
 
-            //scope.register()//.push(dataService.saveStatus(scope.data,scope.previous))            
+            //scope.register()//.push(dataService.saveStatus(scope.data,scope.previous))
 
         }
 
@@ -66,7 +66,7 @@ angular.module('myApp.directives', [])
         }
 
 
-        
+
         scope.$watch('data', update);
         scope.$watch('enableLayout', update);
         scope.$watch('grouping', update);
@@ -92,15 +92,15 @@ angular.module('myApp.directives', [])
         scope.$on("update", update);
 
         scope.$on("applyForceLayout", function(){
-            graph.applyForceLayout();            
+            graph.applyForceLayout();
         });
         scope.$on("applyGroupLayout", function(){
-            graph.applyGroupLayout();            
+            graph.applyGroupLayout();
         });
         scope.$on("applyNoLayout", function(){
-            graph.applyNoLayout();            
+            graph.applyNoLayout();
         });
-        
+
         // selections
         scope.$watch('status.selectFunction', function(selectFunction){
             if (!selectFunction) return;
@@ -117,7 +117,7 @@ angular.module('myApp.directives', [])
       restrict: 'A',
 
       link: function postLink(scope, element, attrs) {
-        
+
         var graph = d3.smooth();
 
         var container = d3.select(element[0]);
@@ -134,14 +134,14 @@ angular.module('myApp.directives', [])
                 scope.status.selection = d.data()//.map(function(n){ return n.data; });
                 if(!scope.$$phase) scope.$apply();
               })
-                .showLinks(scope.status.showLinks)          
+              .showLinks(scope.status.showLinks)
                 // listeners
-                
+
                 /*.on('forceStart', forceStart)
                 .on('forceEnd', forceEnd)
                 .on('zoomEnd', zoomEnd)*/
-                .group(group)
-                .label(label)
+              .group(group)
+              .label(label)
 
             container
               .datum(scope.data)
@@ -157,19 +157,19 @@ angular.module('myApp.directives', [])
             return d.data ? d.data['Full Name'] ? d.data['Full Name'] : 'Untitled' : null;
         }
 
-        
+
         scope.$watch('data', update);
 
         scope.$on("update", update);
 
         scope.$on("applyForceLayout", function(){
-            graph.applyForceLayout();            
+            graph.applyForceLayout();
         });
         scope.$on("applyGroupLayout", function(){
-            graph.applyGroupLayout();            
+            graph.applyGroupLayout();
         });
         scope.$on("applyNoLayout", function(){
-            graph.applyNoLayout();            
+            graph.applyNoLayout();
         });
 
         scope.$watch('status.showLinks', function(showLinks){

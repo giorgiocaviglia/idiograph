@@ -28,9 +28,9 @@
 				svg.call(zoom)
 					.on("dblclick.zoom", null)
 					.on("mousedown.zoom", null)
-			    .on("touchstart.zoom", null)
-			    .on("touchmove.zoom", null)
-			    .on("touchend.zoom", null);
+			   		.on("touchstart.zoom", null)
+			    	.on("touchmove.zoom", null)
+			    	.on("touchend.zoom", null);
 
 				// set up initial nodes and links
 				//  - nodes are known by 'id', not by index in array.

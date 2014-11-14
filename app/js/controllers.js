@@ -56,7 +56,7 @@ angular.module('myApp.controllers', [])
 
     }
 
-  /*
+    
 
     // loading letters
     dataService.loadData('data/graph.json').then(
@@ -71,7 +71,8 @@ angular.module('myApp.controllers', [])
             data: d
           };
         })
-        console.log(data.links)
+                console.log($scope.data)
+
         $scope.$broadcast("update");
 
         },
@@ -81,9 +82,9 @@ angular.module('myApp.controllers', [])
       }
 
     );
-    */
 
 
+    /*
 
     // loading people
     dataService.loadData('data/people.tsv').then(
@@ -156,7 +157,7 @@ angular.module('myApp.controllers', [])
 
     );
 
-    
+    */
 
     /* Import */
 
@@ -307,7 +308,6 @@ angular.module('myApp.controllers', [])
 
     $scope.grouping = function(){
       if (!$scope.status.selection.length) return;
-      console.log($scope.status.groupValue)
 
       $scope.status.selection.forEach(function(d){
         d.groups[$scope.status.groupName] = $scope.status.groupValue;
@@ -346,6 +346,14 @@ angular.module('myApp.controllers', [])
 
     $scope.selectUnlocked = function(){
       $scope.status.selectFunction = function(d){ return !d.fixed; };
+    }
+
+    $scope.selectSameGroup = function(){
+      if ($scope.status.selection.length != 1) return;
+      $scope.status.selectFunction = function(d){
+        var groupValue = $scope.status.selection[0].groups[$scope.status.groupName];
+        return d.groups[$scope.status.groupName] == groupValue;
+      };
     }
 
     $scope.selectMerged = function(){
@@ -430,6 +438,12 @@ angular.module('myApp.controllers', [])
     // Select Inverse
     Mousetrap.bind(['command+i', 'ctrl+i'], function() {
       $scope.selectInverse();
+      $scope.$apply();
+      return false;
+    });
+    // Select None
+    Mousetrap.bind(['command+n', 'ctrl+n'], function(e) {
+      $scope.selectNone();
       $scope.$apply();
       return false;
     });

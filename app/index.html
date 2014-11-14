@@ -37,12 +37,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Mah</a>
+          <a class="navbar-brand" href="#">#</a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-6">
           <ul class="nav navbar-nav">
-  
+
             <!-- File -->
             <li class="dropdown">
               <a id="dropFile" ng-href="!#" role="button" class="dropdown-toggle" data-toggle="dropdown">File</a>
@@ -57,13 +57,13 @@
               <ul class="dropdown-menu" role="menu" aria-labelledby="dropEdit">
                 <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="undo()">Undo<span class="pull-right">&#8984;Z</span></a></li>
                 <li role="presentation" class="divider"></li>
-                <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="delete()">Delete</a></li>
+                <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="delete()">Delete<span class="pull-right">&larr;</span></a></li>
                 <li role="presentation" class="divider"></li>
                 <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="lock()">Lock</a></li>
                 <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="unlock()">Unlock</a></li>
               </ul>
             </li>
-          
+
             <!-- Select -->
             <li class="dropdown">
               <a id="dropSelect" ng-href="!#" role="button" class="dropdown-toggle" data-toggle="dropdown">Select</a>
@@ -78,6 +78,8 @@
                 <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="selectConnected()">Expand Selection to Linked</a></li>
                 <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="selectOutConnected()">Expand Selection to Linked out</a></li>
                 <li role="presentation" ng-class="{disabled:!status.selection.length}"><a role="menuitem" tabindex="-1" ng-click="selectInConnected()">Expand Selection to Linked in</a></li>
+                <li role="presentation" class="divider"></li>
+                <li role="presentation" ng-class="{disabled:status.selection.length != 1}"><a role="menuitem" tabindex="-1" ng-click="selectSameGroup()">Same group</a></li>
                 <li role="presentation" class="divider"></li>
                 <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="selectMerged()">Merged</a></li>
                 <li role="presentation" class="divider"></li>
@@ -96,7 +98,7 @@
                 <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="status.showLabels=false" ng-show="status.showLabels">Hide labels</a></li>
               </ul>
             </li>
-          
+
           </ul>
         </div><!-- /.navbar-collapse -->
       </div>
@@ -105,7 +107,7 @@
     <div class="container-fluid" ng-view></div>
 
 
-  
+
 
   <script src="bower_components/jquery/dist/jquery.min.js"></script>
   <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
